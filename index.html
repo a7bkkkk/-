@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>منيو ريحة أهلنا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Lalezar&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1f3a30;--amber:#e8a62b;--cream:#f2f4ee;--red:#b8321f;--ink:#1c2b24;--mute:#66736c;--chip:#e5eadf}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:"IBM Plex Sans Arabic",Tahoma,sans-serif;background:var(--cream);color:var(--ink);line-height:1.7}
+header{background:var(--green);color:#fff;padding:44px 22px 28px;border-bottom:6px solid transparent;
+ background-image:repeating-linear-gradient(90deg,var(--amber) 0 36px,transparent 36px 52px);background-size:100% 6px;background-repeat:no-repeat;background-position:bottom;
+ background-color:var(--green)}
+header h1{font-family:Lalezar,"IBM Plex Sans Arabic",sans-serif;font-weight:400;font-size:clamp(46px,14vw,84px);line-height:1.15}
+header p{color:#c3cfc8;font-size:18px;max-width:34ch;margin-top:6px}
+nav{position:sticky;top:0;z-index:5;background:var(--green);display:flex;gap:10px;overflow-x:auto;padding:12px 16px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav a{flex:none;color:#fff;text-decoration:none;font-weight:600;font-size:16px;padding:7px 20px;border:2px solid #ffffff44;border-radius:99px;transition:background .15s}
+nav a.on{background:var(--amber);border-color:var(--amber);color:var(--green)}
+nav a:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+main{max-width:720px;margin:0 auto;padding:8px 18px 60px}
+section{padding-top:34px;scroll-margin-top:62px}
+.sh{display:flex;align-items:baseline;gap:14px;padding-bottom:10px;border-bottom:3px solid var(--green)}
+.sh h2{font-family:Lalezar,sans-serif;font-weight:400;font-size:42px;line-height:1.2}
+.sh span{color:var(--mute);font-size:15px}
+.it{padding:16px 0;border-bottom:1px solid #d6dcd2}
+.it:last-child{border-bottom:0}
+.row{display:flex;align-items:baseline;gap:10px}
+.row b{font-size:21px;font-weight:600}
+.dots{flex:1;border-bottom:2px dotted #b9c2b9;min-width:16px;transform:translateY(-4px)}
+.pr{color:var(--red);font-weight:600;font-size:21px;white-space:nowrap}
+.pr small{font-size:13px;margin-inline-start:3px}
+.d{color:var(--mute);font-size:16px;margin-top:2px}
+.cal{display:inline-block;background:var(--chip);color:#44524a;font-size:14px;padding:3px 14px;border-radius:99px;margin-top:8px}
+.na{opacity:.55}
+.na .pr{color:var(--mute);font-size:15px;background:#e3e6df;padding:1px 12px;border-radius:99px}
+footer{text-align:center;color:var(--mute);font-size:14px;padding:20px 18px 40px}
+</style>
+</head>
+<body>
+<header>
+  <h1>منيو ريحة أهلنا</h1>
+  <p>فاهيتة، لفات، بوكسات، صوصات، قهوة وحلويات</p>
+</header>
+<nav id="nav" aria-label="الأقسام"></nav>
+<main id="menu"></main>
+<footer>الأسعار بالدينار العراقي · المنيو للعرض فقط</footer>
+
+<script>
+/* ============ تعديل المنيو ============
+   كل صنف: ["الاسم", "الوصف", السعر, السعرات, غير_متوفر]
+   - السعرات اختيارية: حط 0 أو null إذا ما تريدها
+   - غير متوفر: حط true وراح يطلع "غير متوفر" بدل السعر
+   - لحذف صنف امسح سطره، ولإضافة صنف انسخ سطر وعدّله
+================================================ */
+const MENU = [
+ {id:"fahita", t:"الفاهيتة", i:[
+  ["فاهيتة دجاج ربع كيلو","شرائح دجاج متبّلة ومشوية مع الفلفل والبصل، تكفي شخصًا إلى شخصين.",12000,420],
+  ["فاهيتة دجاج نصف كيلو","حصة عائلية صغيرة من الدجاج المتبّل مع الفلفل والبصل المشوي.",14000,840],
+  ["فاهيتة دجاج كيلو","الحصة الكبيرة للمجموعات: دجاج متبّل مشوي مع الفلفل والبصل.",16000,1680],
+  ["صحن فاهيتة دجاج","صحن فردي من الفاهيتة الساخنة، مناسب لوجبة سريعة.",7000,380],
+  ["فاهيتة أورجينال","الفاهيتة الأصلية بالطعم المعتاد.",9000],
+  ["فاهيتة مطوّرة","نسخة مطوّرة من الفاهيتة بنكهة مميزة.",10000]
+ ]},
+ {id:"special", t:"الأكلات المطوّرة", i:[
+  ["فاهيتة سبيشل","فاهيتة مطوّرة بتحضير خاص من المطعم.",15000],
+  ["فاهيتة بوكس","فاهيتة مطوّرة تُقدَّم بوكس.",13000],
+  ["ستيك دجاج بالعسل","ستيك دجاج مشوي بصوص العسل.",20000],
+  ["سموذي تايم","صدر دجاج مع معكرونة.",12000]
+ ]},
+ {id:"wraps", t:"اللفات", i:[
+  ["لفة فاهيتة صمون كهربائي","صمون كهربائي محشو بدجاج الفاهيتة والخضار.",4000,550],
+  ["لفة ساج فاهيتة","خبز ساج رقيق ملفوف بدجاج الفاهيتة والخضار.",3500,480],
+  ["سلة صمون","سلة صمون بنظام نصف بنصف.",4000],
+  ["لفة قص أورجينال","",6000],
+  ["لفة قص سبايسي","",6000]
+ ]},
+ {id:"meals", t:"الوجبات", i:[
+  ["ريزو","وجبة ريزو.",6000]
+ ]},
+ {id:"pasta", t:"المعكرونة والباستا", i:[
+  ["معكرونة بالبشاميل صينية ١٢ شخص","صينية معكرونة بالبشاميل تكفي ١٢ شخصًا.",12000],
+  ["معكرونة بالبشاميل صينية ٦ أشخاص","صينية معكرونة بالبشاميل تكفي ٦ أشخاص.",6000],
+  ["معكرونة ريحة أهلنا","معكرونة بطريقة البيت الخاصة.",8000],
+  ["باستا إيطالية","باستا بالطريقة الإيطالية.",8000],
+  ["سباغيتي لحم إيطالي","سباغيتي مع لحم بالطريقة الإيطالية.",9000]
+ ]},
+ {id:"boxes", t:"البوكسات", i:[
+  ["بوكس لفتين","لفتان مع بطاطا وصوصات.",8000,1500],
+  ["بوكس ٤ لفات","أربع لفات مع بطاطا وصوصات.",14000,2600],
+  ["بوكس ميكس","بوكس ميكس متنوع.",16000],
+  ["بوكس الفزعة","بوكس للمجموعات.",32000],
+  ["بوكس لمّة هنا","بوكس العائلة والجمعات الكبيرة.",52000]
+ ]},
+ {id:"starters", t:"المقبلات", i:[
+  ["رمانية","طبق رمانية.",3000],
+  ["جاجيك","زبادي بالخيار والثوم.",2500],
+  ["باذنجانية","طبق باذنجان مشوي.",3000],
+  ["حمص بطحينة","حمص مع الطحينة.",3000]
+ ]},
+ {id:"sides", t:"الجانبية", i:[
+  ["بطاطا فينغر بالجبن","أصابع بطاطا مقرمشة مع صوص الجبن.",3500,450],
+  ["بطاطا مقلية","بطاطا ذهبية مقرمشة.",2500],
+  ["ناگتس دجاج","قطع دجاج مقرمشة.",5000]
+ ]},
+ {id:"sauces", t:"الصوصات", i:[
+  ["صوص ريحة أهلنا","صوص البيت الخاص بنكهة الأعشاب والتوابل.",2000,90],
+  ["صوص المكسيكي","صوص حار منعش بالطماطم والفلفل.",1500,40],
+  ["صوص المكس","خلطة كريمية من عدة صوصات بطعم متوازن.",2500,110],
+  ["صوص البرغند","صوص غني وكثيف بنكهة الفلفل والتوابل.",3000,120],
+  ["صوص الإكسترا","صوص إضافي بنكهة قوية.",2000],
+  ["صوص الأورجينال","الصوص الأصلي للمطعم.",2000],
+  ["صوص الثوم","صوص ثوم كريمي.",1500],
+  ["صوص الجبن","صوص جبن دافئ وكريمي.",2500],
+  ["صوص الباربكيو","صوص مدخّن بحلاوة خفيفة.",2000],
+  ["صوص الشطة الحارة","صوص حار قوي لمحبي الحرارة.",1500],
+  ["صوص البرجر","",2000]
+ ]},
+ {id:"croissant", t:"الكرواسون", i:[
+  ["كرواسون سادة","كرواسون طازج بالزبدة.",3000],
+  ["كرواسون بالكاكاو","كرواسون محشو بالكاكاو.",3500],
+  ["كرواسون بالحليب","كرواسون محشو بكريمة الحليب.",3500]
+ ]},
+ {id:"coffee", t:"القهوة", i:[
+  ["إسبريسو","",2500],
+  ["قهوة عادية","",2000],
+  ["قهوة تركية","",2500],
+  ["قهوة ريحة أهلنا","قهوة البيت الخاصة.",3000],
+  ["قهوة تايم","",3000],
+  ["قهوة هوت","",3000],
+  ["قهوة آيس","",3500],
+  ["قهوة فرابيه","",4000]
+ ]},
+ {id:"dessert", t:"الحلويات", i:[
+  ["آيس لوفر","",7000],
+  ["آيس دريم","",7000],
+  ["دروب هوت","",7000],
+  ["كت بار","",7000],
+  ["كت بار زيرو","",7000],
+  ["كيكة الحليب","",7000]
+ ]},
+ {id:"drinks", t:"المشروبات", i:[
+  ["كوكاكولا","مشروب غازي بارد.",500,140],
+  ["سبرايت","مشروب غازي بنكهة الليمون، بارد ومنعش.",500,140],
+  ["ديو","مشروب غازي بنكهة الحمضيات.",500,150],
+  ["بيبسي","مشروب غازي بارد.",500,150]
+ ]},
+ {id:"iraqi", t:"الأكلات العراقية", i:[
+  ["دولمة","",null,0,true],
+  ["برياني","",null,0,true],
+  ["تمن وقيمة","",null,0,true],
+  ["تمن ومرق","",null,0,true],
+  ["كباب","",null,0,true],
+  ["تكة","",null,0,true],
+  ["كبة","",null,0,true],
+  ["باجة","",null,0,true],
+  ["مسگوف","",null,0,true]
+ ]}
+];
+
+const AR = n => String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]);
+const nav = document.getElementById("nav"), main = document.getElementById("menu");
+
+MENU.forEach(s => {
+  nav.insertAdjacentHTML("beforeend", `<a href="#${s.id}" data-id="${s.id}">${s.t}</a>`);
+  const items = s.i.map(([n, d, p, c, na]) => `
+    <div class="it${na ? " na" : ""}">
+      <div class="row"><b>${n}</b><i class="dots"></i>
+        ${na ? `<span class="pr">غير متوفر</span>` : `<span class="pr">${p.toLocaleString("en-US")}<small>د.ع</small></span>`}
+      </div>
+      ${d ? `<p class="d">${d}</p>` : ""}
+      ${c ? `<span class="cal">≈ ${c.toLocaleString("en-US")} سعرة حرارية</span>` : ""}
+    </div>`).join("");
+  main.insertAdjacentHTML("beforeend",
+    `<section id="${s.id}"><div class="sh"><h2>${s.t}</h2><span>${AR(s.i.length)} ${s.i.length > 10 ? "صنف" : s.i.length === 1 ? "صنف" : "أصناف"}</span></div>${items}</section>`);
+});
+
+const links = [...nav.children];
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  links.forEach(a => a.classList.toggle("on", a.dataset.id === e.target.id));
+  const on = nav.querySelector(".on");
+  if (on) nav.scrollTo({left: on.offsetLeft - nav.clientWidth / 2 + on.offsetWidth / 2, behavior: "smooth"});
+}), {rootMargin: "-25% 0px -65% 0px"});
+document.querySelectorAll("section").forEach(s => io.observe(s));
+links[0].classList.add("on");
+</script>
+</body>
+</html>
